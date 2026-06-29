@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Teoh Zi Heng — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- 衬线字体用于标题（杂志感），无衬线字体用于正文（易读） -->
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   一、设计变量 TOKENS
+   风格：无印良品 MUJI 风 + 日系奶油色调 + 暖棕文字 + 杂志排版
+========================================================= */
+:root {
+  /* —— 色彩系统（按用户指定色值） —— */
+  --bg-main:    #F3EFE4;   /* 主背景：奶油米白 */
+  --bg-sub:     #D8D4C8;   /* 次背景：亚麻灰褐 */
+  --text-main:  #1A191E;   /* 主要文字：近黑暖棕 */
+  --btn-color:  #2B2414;   /* 按钮 / 强调色：深棕 */
+  --text-sub:   #5C5648;   /* 辅助文字：浅一些的暖棕灰，衍生色 */
+  --text-mute:  #8A8472;   /* 弱化文字：标签、日期等 */
+  --line:       #C9C3B3;   /* 分隔线：比次背景略深的米褐 */
+  --surface:    #FAF7EF;   /* 卡片浅底：比主背景更亮一点，用于浮起的卡片 */
+  --paper-shadow: 0 1px 0 rgba(26,25,30,0.06);
+
+  /* —— 字体系统 —— */
+  --font-serif: 'Shippori Mincho', serif;       /* 杂志标题用衬线 */
+  --font-sans:  'Zen Kaku Gothic New', sans-serif; /* 正文用无衬线 */
+
+  /* —— 布局 —— */
+  --nav-h: 72px;
+  --gutter: 28px;
+  --radius: 2px;            /* MUJI 风格几乎不用圆角，保持方正、克制 */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================
+   二、基础重置 RESET
+========================================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.75;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+
+/* =========================================================
+   三、滚动渐入动效基础类
+   配合 JS 的 IntersectionObserver 使用：
+   元素默认 .reveal（透明+下移），进入视口后加 .is-visible
+========================================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* 子元素错落延迟，营造杂志逐行排印的感觉 */
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* =========================================================
+   四、顶部导航 NAVIGATION
+========================================================= */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(243,239,228,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--gutter);
+}
+
+/* Logo：杂志刊头风格 */
+.nav-logo {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-main);
+}
+.nav-logo .logo-no {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 2px;
+  display: block;
+  margin-top: 1px;
+}
+
+/* 导航链接（PC 端） */
+.nav-links { display: flex; gap: 6px; }
+.nav-links button {
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-sub);
+  padding: 7px 16px;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.nav-links button:hover {
+  color: var(--text-main);
+  border-color: var(--line);
+}
+.nav-links button.active {
+  color: var(--bg-main);
+  background: var(--btn-color);
+  border-color: var(--btn-color);
+}
+
+/* 移动端汉堡按钮 */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--text-main);
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+
+/* 移动端下拉菜单 */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0; right: 0;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--line);
+  padding: 10px var(--gutter) 16px;
+  flex-direction: column;
+  z-index: 99;
+  box-shadow: 0 12px 24px rgba(26,25,30,0.06);
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu button {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-sub);
+  padding: 14px 4px;
+  text-align: left;
+  transition: color 0.25s var(--ease);
+}
+.mobile-menu button:last-child { border-bottom: none; }
+.mobile-menu button.active,
+.mobile-menu button:hover { color: var(--btn-color); }
+
+/* =========================================================
+   五、整体布局 LAYOUT
+   杂志风：左侧留出竖排刊号栏，主内容偏右，营造版心错位的编辑感
+========================================================= */
+.page-wrap {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-top: var(--nav-h);
+}
+
+/* 左侧竖排栏：当前页码 / 装饰刊号，纯视觉，不影响阅读 */
+.side-rail {
+  border-right: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px;
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+}
+.side-rail-text {
+  writing-mode: vertical-rl;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text-mute);
+}
+
+main {
+  padding: 56px var(--gutter) 100px;
+  max-width: 980px;
+}
+
+/* =========================================================
+   六、内容区块切换 SECTIONS
+========================================================= */
+.section { display: none; }
+.section.active { display: block; }
+
+/* =========================================================
+   七、首页 HOME — 杂志封面式排版
+========================================================= */
+.issue-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.issue-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 48px;
+  align-items: start;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 48px;
+}
+
+/* 杂志大标题：姓名 */
+.home-name {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 7vw, 84px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -1px;
+  color: var(--text-main);
+  margin-bottom: 22px;
+}
+.home-name em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-sub);
+}
+
+.home-role {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--btn-color);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-bio {
+  font-size: 15px;
+  color: var(--text-sub);
+  line-height: 1.9;
+  max-width: 540px;
+  margin-bottom: 30px;
+}
+/* 杂志引言风格的首字下沉装饰（仅装饰首段） */
+.home-bio::first-letter {
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--btn-color);
+  float: left;
+  line-height: 0.8;
+  padding-right: 8px;
+  padding-top: 4px;
+}
+
+/* 联系方式：低调列表，非按钮气泡 */
+.contact-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.25s var(--ease), padding-left 0.25s var(--ease);
+  max-width: 360px;
+}
+.contact-row:hover { color: var(--btn-color); padding-left: 6px; }
+.contact-row .label {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* 语言：杂志式标签横排 */
+.lang-row { display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+.lang-item {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-sub);
+  padding: 0 14px 0 0;
+  margin-right: 14px;
+  border-right: 1px solid var(--line);
+}
+.lang-item:last-child { border-right: none; }
+
+/* —— 头像区域 —— */
+.avatar-col { display: flex; flex-direction: column; gap: 14px; }
+.avatar-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid var(--line);
+  background: var(--bg-sub);
+  position: relative;
+  overflow: hidden;
+}
+#avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* JS 检测成功后显示 */
+}
+/* 占位符：图片未找到时的优雅备用样式 */
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-mute);
+}
+.avatar-placeholder .ph-mark {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+.avatar-placeholder .ph-hint {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 16px;
+}
+/* 角落十字标记，模拟相纸/底片边角，呼应杂志摄影排版 */
+.avatar-frame::before, .avatar-frame::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border: 1px solid var(--text-mute);
+  opacity: 0.5;
+}
+.avatar-frame::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.avatar-frame::after  { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+.avatar-caption {
+  font-size: 11px;
+  color: var(--text-mute);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* 首页数据统计：杂志式三栏，无卡片底色，仅靠分隔线 */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.stat-card {
+  padding: 0 24px;
+  border-right: 1px solid var(--line);
+}
+.stat-card:first-child { padding-left: 0; }
+.stat-card:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--btn-color);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-desc {
+  font-size: 12.5px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+/* =========================================================
+   八、栏目标题 — 杂志页眉式
+========================================================= */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 44px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--text-main);
+}
+.sec-title-group .sec-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+}
+.sec-title {
+  font-family: var(--font-serif);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+.sec-folio {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--text-mute);
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   九、经历 EXPERIENCE — 杂志专题文章式排版
+========================================================= */
+.article-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 32px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+}
+.article-item:first-child { padding-top: 0; }
+.article-item:last-child { border-bottom: none; }
+
+.article-date {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--text-mute);
+  line-height: 1.6;
+  padding-top: 6px;
+}
+.article-date .yr { display: block; font-size: 22px; color: var(--btn-color); font-weight: 700; }
+
+.article-org {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+.article-role {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--btn-color);
+  margin-bottom: 18px;
+}
+
+.article-bullets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+.article-bullet {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-sub);
+  line-height: 1.75;
+}
+.article-bullet .mark {
+  font-family: var(--font-serif);
+  color: var(--btn-color);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* 标签：低饱和，纯文字+边框，无填充色块 */
+.article-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.article-tag {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-sub);
+  border: 1px solid var(--line);
+  padding: 4px 12px;
+}
+
+/* =========================================================
+   十、教育 EDUCATION
+========================================================= */
+.edu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--line);
+}
+.edu-card {
+  padding: 36px;
+  position: relative;
+}
+.edu-card:first-child { border-right: 1px solid var(--line); }
+.edu-level {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+}
+.edu-degree {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.edu-school {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  margin-bottom: 28px;
+}
+.edu-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.edu-date { font-size: 12px; color: var(--text-mute); }
+.edu-gpa {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--btn-color);
+  line-height: 1;
+}
+.edu-gpa-label {
+  font-size: 9.5px;
+  color: var(--text-mute);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* =========================================================
+   十一、技能 SKILLS
+========================================================= */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.skill-group {
+  padding: 32px 36px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.skill-group-title {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-main);
+  margin-bottom: 22px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.skill-list { display: flex; flex-direction: column; gap: 16px; }
+.skill-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+.skill-name { font-size: 13.5px; font-weight: 500; color: var(--text-main); }
+.skill-level { font-size: 10.5px; color: var(--text-mute); letter-spacing: 0.5px; }
+.skill-bar-bg { height: 2px; background: var(--bg-sub); }
+.skill-bar-fill { height: 100%; background: var(--btn-color); transition: width 1s var(--ease); }
+
+.tools-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+.tool-tag {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-sub);
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0 4px 0;
+  margin-right: 4px;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.tool-tag:hover { color: var(--btn-color); border-color: var(--btn-color); }
+
+/* =========================================================
+   十二、荣誉/成就 ACHIEVEMENTS — 杂志画廊式，含图片+说明文字
+========================================================= */
+.achieve-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px 36px;
+}
+.achieve-card { display: flex; flex-direction: column; }
+
+/* 照片区域 —— 占位图清晰标注，便于用户替换 */
+.achieve-photo-frame {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.achieve-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* JS 检测到图片存在才显示 */
+}
+/* 占位符内容：清楚写明应替换的文件名 */
+.achieve-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-mute);
+  text-align: center;
+  padding: 0 16px;
+}
+.achieve-photo-placeholder .ph-icon {
+  font-size: 26px;
+  opacity: 0.6;
+}
+.achieve-photo-placeholder .ph-filename {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--btn-color);
+  letter-spacing: 0.5px;
+  background: var(--bg-main);
+  padding: 3px 10px;
+  border: 1px dashed var(--text-mute);
+}
+.achieve-photo-placeholder .ph-size {
+  font-size: 10px;
+  color: var(--text-mute);
+}
+/* 角标：图片编号，呼应杂志画廊排版 */
+.achieve-photo-frame .photo-no {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-mute);
+  background: rgba(243,239,228,0.85);
+  padding: 2px 8px;
+  z-index: 2;
+}
+
+.achieve-date {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+}
+.achieve-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.achieve-sub {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--btn-color);
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.achieve-desc {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+/* 照片配文 —— 用户可编辑的一小段文字，呈现为图说 caption 样式 */
+.achieve-caption {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-style: italic;
+  line-height: 1.6;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+}
+
+/* =========================================================
+   十三、页脚 FOOTER
+========================================================= */
+footer {
+  text-align: center;
+  padding: 36px 24px;
+  font-size: 11.5px;
+  color: var(--text-mute);
+  border-top: 1px solid var(--line);
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   十四、响应式布局 RESPONSIVE — 手机/平板适配
+========================================================= */
+@media (max-width: 900px) {
+  .page-wrap { grid-template-columns: 1fr; }
+  .side-rail { display: none; } /* 移动端隐藏装饰竖栏，节省空间 */
+  main { padding: 40px 20px 80px; }
+
+  .home-hero { grid-template-columns: 1fr; gap: 32px; }
+  .avatar-col { max-width: 240px; margin: 0 auto; order: -1; } /* 头像移到文字上方 */
+  .home-name { font-size: clamp(40px, 11vw, 56px); }
+
+  .article-item { grid-template-columns: 1fr; gap: 12px; }
+  .article-date { display: flex; align-items: baseline; gap: 8px; padding-top: 0; }
+  .article-date .yr { font-size: 16px; }
+
+  .edu-grid { grid-template-columns: 1fr; }
+  .edu-card:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+
+  .skills-grid { grid-template-columns: 1fr; }
+  .skill-group { border-right: none; }
+
+  .achieve-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 700px) {
+  nav { padding: 0 18px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-card { border-right: none; border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .stat-card:first-child { padding-top: 0; }
+  .stat-card:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .sec-title { font-size: 28px; }
+  .sec-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  .home-bio::first-letter { font-size: 32px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================================
+     顶部导航 NAVIGATION
+====================================================== -->
+<nav>
+  <div class="nav-logo">TEOH ZI HENG<span class="logo-no">PERSONAL PORTFOLIO</span></div>
+
+  <!-- PC 端导航 -->
+  <ul class="nav-links" id="navLinks">
+    <li><button class="active" data-section="home" onclick="showSection('home', this)">Home</button></li>
+    <li><button data-section="experience" onclick="showSection('experience', this)">Experience</button></li>
+    <li><button data-section="education" onclick="showSection('education', this)">Education</button></li>
+    <li><button data-section="skills" onclick="showSection('skills', this)">Skills</button></li>
+    <li><button data-section="achievements" onclick="showSection('achievements', this)">Achievements</button></li>
+  </ul>
+
+  <!-- 移动端汉堡按钮 -->
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- 移动端下拉菜单 -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="active" onclick="showSection('home', this); closeMobileMenu()">Home</button>
+  <button onclick="showSection('experience', this); closeMobileMenu()">Experience</button>
+  <button onclick="showSection('education', this); closeMobileMenu()">Education</button>
+  <button onclick="showSection('skills', this); closeMobileMenu()">Skills</button>
+  <button onclick="showSection('achievements', this); closeMobileMenu()">Achievements</button>
+</div>
+
+<!-- ======================================================
+     页面整体容器（含左侧装饰竖栏 + 主内容）
+====================================================== -->
+<div class="page-wrap">
+
+  <!-- 左侧竖排装饰栏，仅 PC 端显示，呼应杂志页边刊号 -->
+  <div class="side-rail">
+    <span class="side-rail-text">PORTFOLIO — 2025 EDITION</span>
+  </div>
+
+  <main>
+
+    <!-- ============ 首页 HOME ============ -->
+    <section class="section active" id="home">
+
+      <p class="issue-label reveal">ISSUE NO.01 — INTRODUCTION</p>
+
+      <div class="home-hero">
+        <!-- 左：文字区块 -->
+        <div>
+          <h1 class="home-name reveal reveal-delay-1">Teoh<br><em>Zi Heng</em></h1>
+          <p class="home-role reveal reveal-delay-2">Aspiring Data Analyst &amp; Business Intelligence Specialist</p>
+          <p class="home-bio reveal reveal-delay-2">
+            Fresh graduate in Business Information Systems (Data Analytics) with hands-on experience
+            delivering automation and analytics solutions in a corporate environment. Passionate about
+            transforming raw data into actionable business value through Python, Power BI, and Tableau.
+          </p>
+
+          <!-- 联系方式 -->
+          <div class="contact-list reveal reveal-delay-3">
+            <a class="contact-row" href="tel:+60194079661">
+              <span class="label">Phone</span> +60 19-407 9661
+            </a>
+            <a class="contact-row" href="mailto:teohziheng2002@gmail.com">
+              <span class="label">Email</span> teohziheng2002@gmail.com
+            </a>
+            <a class="contact-row" href="https://www.linkedin.com/in/zihengteoh" target="_blank" rel="noopener">
+              <span class="label">LinkedIn</span> linkedin.com/in/zihengteoh
+            </a>
+          </div>
+
+          <!-- 语言 -->
+          <div class="lang-row reveal reveal-delay-4">
+            <span class="lang-item">English</span>
+            <span class="lang-item">Malay</span>
+            <span class="lang-item">Mandarin</span>
+            <span class="lang-item">Cantonese</span>
+          </div>
+        </div>
+
+        <!-- 右：头像区块 -->
+        <div class="avatar-col reveal reveal-delay-2">
+          <div class="avatar-frame">
+            <!-- JS 会按优先级依次尝试 avatar.png → avatar.jpg → avatar.jpeg -->
+            <img id="avatar-img" alt="Teoh Zi Heng" />
+            <!-- 占位符：清晰标注替换方式 -->
+            <div class="avatar-placeholder" id="avatar-placeholder">
+              <span class="ph-mark">TZH</span>
+              <span class="ph-hint">【占位头像】<br>请将照片命名为<br>avatar.png / .jpg / .jpeg<br>放入本文件同一目录</span>
+            </div>
+          </div>
+          <p class="avatar-caption">FIG. 01 — PORTRAIT</p>
+        </div>
+      </div>
+
+      <!-- 数据统计 -->
+      <div class="stats-row reveal">
+        <div class="stat-card">
+          <div class="stat-num">15+</div>
+          <div class="stat-desc">Automation initiatives delivered at AstraZeneca</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">40+</div>
+          <div class="stat-desc">Analytics &amp; automation projects consulted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3.45</div>
+          <div class="stat-desc">CGPA — Bachelor of Information Systems</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 经历 EXPERIENCE ============ -->
+    <section class="section" id="experience">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Career &amp; Projects</p>
+          <h2 class="sec-title">Experience</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.02</span>
+      </div>
+
+      <!-- AstraZeneca -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2025</span>Jan – May</div>
+        <div>
+          <h3 class="article-org">AstraZeneca</h3>
+          <p class="article-role">Innovation &amp; Strategy Intern</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Partnered with trainers and internal stakeholders to support digital upskilling programs
+              for 100+ participants, enabling adoption of self-service reporting and automation tools,
+              resulting in improved workflow efficiency and a stronger data-driven decision-making culture.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Consulted on and supported over 40 automation and data analytics projects within the
+              finance function in Kuala Lumpur, enabling smoother financial reporting and providing
+              stakeholders with a more comprehensive view of financial processes.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Developed and implemented automation solutions across multiple departments, saving an
+              estimated 10–200 working hours annually per project.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Delivered over 15 automation initiatives, including SAP Data Extraction, BSR Automation,
+              OCR Systems, Automated Inquiry Resolution Platform, and Leaver Tracker, collectively
+              enhancing process efficiency and reducing manual workload.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">10–200 hrs saved / project</span>
+            <span class="article-tag">40+ projects</span>
+            <span class="article-tag">Python</span>
+            <span class="article-tag">Power BI</span>
+            <span class="article-tag">SAP</span>
+            <span class="article-tag">OCR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Year Project -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2024</span>July</div>
+        <div>
+          <h3 class="article-org">Final Year Project</h3>
+          <p class="article-role">Social Media Sentiment Analysis — Taylor Swift's Eras Tour (Singapore)</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Conducted a large-scale sentiment analysis on social media data to evaluate public
+              reactions toward the concert announcement in Singapore.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Delivered an analytical report on audience emotions and engagement trends, identifying key
+              behavioral patterns and engagement preferences from the data.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Communicated sentiment trends through data visualization and storytelling to help
+              audiences understand the overall public impact and reaction.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Utilized R Studio for text mining and sentiment classification, and Tableau for data
+              visualization and insight presentation.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">R Studio</span>
+            <span class="article-tag">Tableau</span>
+            <span class="article-tag">Text Mining</span>
+            <span class="article-tag">NLP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Spark -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2024</span>May</div>
+        <div>
+          <h3 class="article-org">Data Spark Competition</h3>
+          <p class="article-role">Competitor — Top 6 Finalist</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Achieved Top 6 in the competition by analyzing global QS university datasets to identify
+              trends in international student distribution, research output, and institutional
+              performance.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Collaborated in a team to deliver data-driven insights and present findings on stage to
+              judges and participants, demonstrating strong analytical and presentation skills.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">Top 6 Finalist</span>
+            <span class="article-tag">Data Analysis</span>
+            <span class="article-tag">Presentation</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 教育 EDUCATION ============ -->
+    <section class="section" id="education">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Academic Background</p>
+          <h2 class="sec-title">Education</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.03</span>
+      </div>
+
+      <div class="edu-grid reveal">
+
+        <!-- Swinburne -->
+        <div class="edu-card">
+          <p class="edu-level">Bachelor's Degree</p>
+          <h3 class="edu-degree">Bachelor of Information System<br>Major in Data Analytics</h3>
+          <p class="edu-school">Swinburne University of Technology</p>
+          <div class="edu-meta-row">
+            <span class="edu-date">Aug 2022 – 2025</span>
+            <div>
+              <div class="edu-gpa">3.45</div>
+              <div class="edu-gpa-label">CGPA</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UTAR -->
+        <div class="edu-card">
+          <p class="edu-level">Foundation</p>
+          <h3 class="edu-degree">Foundation in Arts</h3>
+          <p class="edu-school">Universiti Tunku Abdul Rahman (UTAR)</p>
+          <div class="edu-meta-row">
+            <span class="edu-date">Mar 2020 – Mar 2021</span>
+            <div>
+              <div class="edu-gpa">3.50</div>
+              <div class="edu-gpa-label">CGPA</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 技能 SKILLS ============ -->
+    <section class="section" id="skills">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Competencies</p>
+          <h2 class="sec-title">Skills &amp; Tools</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.04</span>
+      </div>
+
+      <div class="skills-grid reveal">
+
+        <!-- 编程与数据 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Programming &amp; Data</p>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Python (Pandas, OpenPyXL, Selenium, Pytesseract)</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">SQL</span>
+                <span class="skill-level">Proficient</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">R Studio</span>
+                <span class="skill-level">Proficient</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BI 与可视化 -->
+        <div class="skill-group">
+          <p class="skill-group-title">BI &amp; Visualisation</p>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Power BI</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:82%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Tableau</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Microsoft Excel</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 工具与平台 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Tools &amp; Platforms</p>
+          <div class="tools-cloud">
+            <span class="tool-tag">Power Apps</span>
+            <span class="tool-tag">Front End Web Dev</span>
+            <span class="tool-tag">SAP Data Extraction</span>
+            <span class="tool-tag">OCR Systems</span>
+            <span class="tool-tag">BSR Automation</span>
+          </div>
+        </div>
+
+        <!-- 软技能 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Professional Skills</p>
+          <div class="tools-cloud">
+            <span class="tool-tag">Data Storytelling</span>
+            <span class="tool-tag">Stakeholder Comms</span>
+            <span class="tool-tag">Problem Solving</span>
+            <span class="tool-tag">Project Consulting</span>
+            <span class="tool-tag">Process Automation</span>
+            <span class="tool-tag">Digital Upskilling</span>
+            <span class="tool-tag">Team Collaboration</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 荣誉/成就 ACHIEVEMENTS ============ -->
+    <section class="section" id="achievements">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Recognition &amp; Highlights</p>
+          <h2 class="sec-title">Achievements</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.05</span>
+      </div>
+
+      <div class="achieve-grid">
+
+        <!-- 卡片 1：Data Spark Competition -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-1">
+            <span class="photo-no">01</span>
+            <!-- JS 会依次尝试 achievement-1.png / .jpg / .jpeg -->
+            <img alt="Data Spark Competition photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-1.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">MAY 2024</div>
+          <div class="achieve-title">Data Spark Competition</div>
+          <div class="achieve-sub">Top 6 Finalist</div>
+          <p class="achieve-desc">
+            Achieved Top 6 among competing teams by analyzing global QS university datasets to uncover
+            trends in international student distribution, research output, and institutional performance.
+          </p>
+          <!-- 照片配文：可在此处直接编辑替换为自己的说明文字 -->
+          <p class="achieve-caption">On stage presenting our team's findings to the judging panel.</p>
+        </div>
+
+        <!-- 卡片 2：AstraZeneca Automation -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-2">
+            <span class="photo-no">02</span>
+            <img alt="AstraZeneca automation initiatives photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-2.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">JAN – MAY 2025</div>
+          <div class="achieve-title">15+ Automation Initiatives at AstraZeneca</div>
+          <div class="achieve-sub">10–200 hrs saved / project</div>
+          <p class="achieve-desc">
+            Delivered over 15 automation solutions including SAP Data Extraction, BSR Automation, OCR
+            Systems, Automated Inquiry Resolution Platform, and Leaver Tracker.
+          </p>
+          <p class="achieve-caption">A snapshot from the digital upskilling workshop in Kuala Lumpur.</p>
+        </div>
+
+        <!-- 卡片 3：Final Year Project -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-3">
+            <span class="photo-no">03</span>
+            <img alt="Final Year Project photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-3.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">JULY 2024</div>
+          <div class="achieve-title">Final Year Project — Sentiment Analysis</div>
+          <div class="achieve-sub">Large-scale Social Media Study</div>
+          <p class="achieve-desc">
+            Conducted a large-scale sentiment analysis on social media reactions to Taylor Swift's Eras
+            Tour announcement in Singapore, delivering an analytical report on public emotions and trends.
+          </p>
+          <p class="achieve-caption">Presenting the sentiment analysis dashboard built in Tableau.</p>
+        </div>
+
+        <!-- 卡片 4：Swinburne Graduation -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-4">
+            <span class="photo-no">04</span>
+            <img alt="Swinburne University graduation photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-4.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">AUG 2022 – 2025</div>
+          <div class="achieve-title">Bachelor's Degree — CGPA 3.45</div>
+          <div class="achieve-sub">Swinburne University</div>
+          <p class="achieve-desc">
+            Completed a Bachelor of Information System majoring in Data Analytics at Swinburne University
+            of Technology, achieving a strong CGPA of 3.45.
+          </p>
+          <p class="achieve-caption">Outside the Swinburne campus on graduation day.</p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 页脚 -->
+<footer>
+  <p>© 2025 Teoh Zi Heng · Built with HTML, CSS &amp; JavaScript</p>
+</footer>
+
+<!-- ======================================================
+     JAVASCRIPT 脚本区
+====================================================== -->
+  <script>
+  /* -------------------------------------------------------
+    一、栏目切换逻辑
+    点击导航按钮时，显示对应 section，隐藏其余所有 section
+    同时同步 PC 端与移动端两套菜单的高亮状态
+  ------------------------------------------------------- */
+  function showSection(id, clickedBtn) {
+    // 隐藏所有内容区块
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    // 显示目标区块
+    document.getElementById(id).classList.add('active');
+
+    // 清除所有导航按钮的 active 状态
+    document.querySelectorAll('#navLinks button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#mobileMenu button').forEach(b => b.classList.remove('active'));
+
+    // 给 PC 端对应按钮加上 active
+    document.querySelectorAll('#navLinks button').forEach(b => {
+      if (b.getAttribute('data-section') === id) b.classList.add('active');
+    });
+    // 给移动端对应按钮加上 active（通过 onclick 字符串匹配 section id）
+    document.querySelectorAll('#mobileMenu button').forEach(b => {
+      if (b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add('active');
+    });
+
+    // 切换栏目后，重新触发一次滚动检测，确保新区块内的 reveal 元素能正确显示
+    setTimeout(revealCheck, 50);
+    // 回到页面顶部，避免切换栏目后停留在上一页面的滚动位置
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  /* -------------------------------------------------------
+    二、移动端菜单开关
+  ------------------------------------------------------- */
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+  function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+  // 点击菜单外部区域时自动收起移动端菜单
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobileMenu');
+    const ham  = document.getElementById('hamburger');
+    if (menu.classList.contains('open') && !menu.contains(e.target) && !ham.contains(e.target)) {
+      closeMobileMenu();
+    }
+  });
+
+  /* -------------------------------------------------------
+    三、头像图片「优先级探测」函数
+    依次尝试 avatar.png → avatar.jpg → avatar.jpeg
+    只要任意一种格式加载成功，立即显示该图片并隐藏占位符
+    若全部失败，则保留占位符（不会导致布局塌陷）
+  ------------------------------------------------------- */
+  (function detectAvatar() {
+    const formats = ['avatar.png', 'avatar.jpg', 'avatar.jpeg'];
+    const img = document.getElementById('avatar-img');
+    const placeholder = document.getElementById('avatar-placeholder');
+    let tried = 0;
+
+    function tryNext() {
+      if (tried >= formats.length) return; // 全部尝试失败，保留占位符
+      img.onload = function() {
+        placeholder.style.display = 'none';
+        img.style.display = 'block';
+      };
+      img.onerror = function() {
+        tried++;
+        tryNext();
+      };
+      img.src = formats[tried++];
+    }
+    tryNext();
+  })();
+
+  /* -------------------------------------------------------
+    四、成就照片「优先级探测」函数（可复用同一套逻辑）
+    每个 .achieve-photo-frame 都带有 data-photo-base 属性
+    例如 data-photo-base="achievement-1" 会依次尝试：
+    achievement-1.png → achievement-1.jpg → achievement-1.jpeg
+  ------------------------------------------------------- */
+  (function detectAchievementPhotos() {
+    document.querySelectorAll('.achieve-photo-frame').forEach(frame => {
+      const base = frame.getAttribute('data-photo-base');
+      if (!base) return;
+      const formats = [`${base}.png`, `${base}.jpg`, `${base}.jpeg`];
+      const img = frame.querySelector('img');
+      const placeholder = frame.querySelector('.achieve-photo-placeholder');
+      let tried = 0;
+
+      function tryNext() {
+        if (tried >= formats.length) return;
+        img.onload = function() {
+          placeholder.style.display = 'none';
+          img.style.display = 'block';
+        };
+        img.onerror = function() {
+          tried++;
+          tryNext();
+        };
+        img.src = formats[tried++];
+      }
+      tryNext();
+    });
+  })();
+
+  /* -------------------------------------------------------
+    五、滚动渐入动效（Scroll Reveal）
+    使用 IntersectionObserver 监听所有 .reveal 元素
+    元素进入视口时添加 .is-visible 类，触发 CSS 渐入动画
+  ------------------------------------------------------- */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target); // 触发一次后不再监听，提升性能
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  function revealCheck() {
+    document.querySelectorAll('.reveal').forEach(el => {
+      if (!el.classList.contains('is-visible')) revealObserver.observe(el);
+    });
+  }
+  revealCheck(); // 页面加载时先执行一次
+
+  /* -------------------------------------------------------
+    六、技能条动画
+    利用 IntersectionObserver，当技能区块进入视口时，
+    将技能条从 0 宽度过渡到实际百分比宽度
+  ------------------------------------------------------- */
+  (function animateBars() {
+    document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+      bar._targetWidth = bar.style.width;
+      bar.style.width = '0%';
+    });
+
+    const barObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+            setTimeout(() => { bar.style.width = bar._targetWidth; }, 100);
+          });
+          barObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.skill-group').forEach(g => barObs.observe(g));
+  })();
+  </script>
+
+</body>
+</html>

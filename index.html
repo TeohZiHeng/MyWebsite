@@ -1,0 +1,2723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Teoh Zi Heng — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- 衬线字体用于标题（杂志感），无衬线字体用于正文（易读） -->
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+<style>
+/* =========================================================
+   一、设计变量 TOKENS
+   风格：无印良品 MUJI 风 + 日系奶油色调 + 暖棕文字 + 杂志排版
+========================================================= */
+:root {
+  /* —— 色彩系统（按用户指定色值） —— */
+  --bg-main:    #F3EFE4;   /* 主背景：奶油米白 */
+  --bg-sub:     #D8D4C8;   /* 次背景：亚麻灰褐 */
+  --text-main:  #1A191E;   /* 主要文字：近黑暖棕 */
+  --btn-color:  #2B2414;   /* 按钮 / 强调色：深棕 */
+  --text-sub:   #5C5648;   /* 辅助文字：浅一些的暖棕灰，衍生色 */
+  --text-mute:  #8A8472;   /* 弱化文字：标签、日期等 */
+  --line:       #C9C3B3;   /* 分隔线：比次背景略深的米褐 */
+  --surface:    #FAF7EF;   /* 卡片浅底：比主背景更亮一点，用于浮起的卡片 */
+  --paper-shadow: 0 1px 0 rgba(26,25,30,0.06);
+
+  /* —— 字体系统 —— */
+  --font-serif: 'Shippori Mincho', serif;       /* 杂志标题用衬线 */
+  --font-sans:  'Zen Kaku Gothic New', sans-serif; /* 正文用无衬线 */
+
+  /* —— 布局 —— */
+  --nav-h: 72px;
+  --gutter: 28px;
+  --radius: 2px;            /* MUJI 风格几乎不用圆角，保持方正、克制 */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================
+   二、基础重置 RESET
+========================================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.75;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+
+/* =========================================================
+   三、滚动渐入动效基础类
+   配合 JS 的 IntersectionObserver 使用：
+   元素默认 .reveal（透明+下移），进入视口后加 .is-visible
+========================================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* 子元素错落延迟，营造杂志逐行排印的感觉 */
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* =========================================================
+   四、顶部导航 NAVIGATION
+========================================================= */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(243,239,228,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--gutter);
+}
+
+/* Logo：杂志刊头风格 */
+.nav-logo {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-main);
+}
+.nav-logo .logo-no {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 2px;
+  display: block;
+  margin-top: 1px;
+}
+
+/* 导航链接（PC 端） */
+.nav-links { display: flex; gap: 6px; }
+.nav-links button {
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-sub);
+  padding: 7px 16px;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.nav-links button:hover {
+  color: var(--text-main);
+  border-color: var(--line);
+}
+.nav-links button.active {
+  color: var(--bg-main);
+  background: var(--btn-color);
+  border-color: var(--btn-color);
+}
+
+/* 移动端汉堡按钮 */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--text-main);
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+
+/* 移动端下拉菜单 */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0; right: 0;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--line);
+  padding: 10px var(--gutter) 16px;
+  flex-direction: column;
+  z-index: 99;
+  box-shadow: 0 12px 24px rgba(26,25,30,0.06);
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu button {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-sub);
+  padding: 14px 4px;
+  text-align: left;
+  transition: color 0.25s var(--ease);
+}
+.mobile-menu button:last-child { border-bottom: none; }
+.mobile-menu button.active,
+.mobile-menu button:hover { color: var(--btn-color); }
+
+/* =========================================================
+   五、整体布局 LAYOUT
+   杂志风：左侧留出竖排刊号栏，主内容偏右，营造版心错位的编辑感
+========================================================= */
+.page-wrap {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-top: var(--nav-h);
+}
+
+/* 左侧竖排栏：当前页码 / 装饰刊号，纯视觉，不影响阅读 */
+.side-rail {
+  border-right: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px;
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+}
+.side-rail-text {
+  writing-mode: vertical-rl;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text-mute);
+}
+
+main {
+  padding: 56px var(--gutter) 100px;
+  max-width: 980px;
+}
+
+/* =========================================================
+   六、内容区块切换 SECTIONS
+========================================================= */
+.section { display: none; }
+.section.active { display: block; }
+
+/* =========================================================
+   七、首页 HOME — 杂志封面式排版
+========================================================= */
+.issue-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.issue-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 48px;
+  align-items: start;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 48px;
+}
+
+/* 杂志大标题：姓名 */
+.home-name {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 7vw, 84px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -1px;
+  color: var(--text-main);
+  margin-bottom: 22px;
+}
+.home-name em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-sub);
+}
+
+.home-role {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--btn-color);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.home-bio {
+  font-size: 15px;
+  color: var(--text-sub);
+  line-height: 1.9;
+  max-width: 540px;
+  margin-bottom: 30px;
+}
+/* 杂志引言风格的首字下沉装饰（仅装饰首段） */
+.home-bio::first-letter {
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--btn-color);
+  float: left;
+  line-height: 0.8;
+  padding-right: 8px;
+  padding-top: 4px;
+}
+
+/* 联系方式：低调列表，非按钮气泡 */
+.contact-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.25s var(--ease), padding-left 0.25s var(--ease);
+  max-width: 360px;
+}
+.contact-row:hover { color: var(--btn-color); padding-left: 6px; }
+.contact-row .label {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* 语言：杂志式标签横排 */
+.lang-row { display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+.lang-item {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-sub);
+  padding: 0 14px 0 0;
+  margin-right: 14px;
+  border-right: 1px solid var(--line);
+}
+.lang-item:last-child { border-right: none; }
+
+/* =========================================================
+   头像区域 —— 工牌挂绳 LANYARD BADGE 设计
+   结构：挂绳带（顶部，带文字压印）→ 金属扣环 → 卡片式工牌（含照片/占位符）
+   悬停时整体轻微摆动，模拟真实工牌挂在身上晃动的质感
+========================================================= */
+.avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* 整个工牌组件（挂绳+扣环+卡片）作为一个整体摆动单元 */
+.lanyard-unit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+  animation: lanyardSway 4.5s ease-in-out infinite;
+}
+@keyframes lanyardSway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate(1.2deg); }
+}
+/* 鼠标悬停时摆动幅度加大，增加互动趣味 */
+.lanyard-unit:hover { animation: lanyardSwayHover 1.6s ease-in-out infinite; }
+@keyframes lanyardSwayHover {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+/* 挂绳带：用条纹渐变模拟织带纹理，顶部两端固定（视觉上挂在脖子上方） */
+.lanyard-strap {
+  width: 64px;
+  height: 92px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--btn-color) 0px, var(--btn-color) 8px,
+    #3d3322 8px, #3d3322 16px
+  );
+  border-radius: 0 0 4px 4px;
+  position: relative;
+  box-shadow: var(--paper-shadow);
+}
+/* 挂绳上压印的文字（如姓名缩写），呼应工牌定制感 */
+.lanyard-strap::before {
+  content: 'TZH · PORTFOLIO · TZH · PORTFOLIO';
+  position: absolute;
+  top: 14px; left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(243,239,228,0.55);
+  font-family: var(--font-sans);
+}
+
+/* 金属扣环：连接挂绳与卡片 */
+.lanyard-clip {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #A8A28E;
+  border-radius: 50%;
+  background: var(--bg-main);
+  margin-top: -13px;
+  z-index: 2;
+  box-shadow: inset 0 0 0 2px var(--bg-main), 0 1px 2px rgba(26,25,30,0.25);
+}
+
+/* 工牌卡片本体 */
+.badge-card {
+  width: 100%;
+  max-width: 230px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-top: -4px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 14px 28px rgba(26,25,30,0.16);
+  position: relative;
+}
+/* 卡片顶部打孔，呼应真实工牌的挂孔细节 */
+.badge-card::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%;
+  transform: translateX(-50%);
+  width: 14px; height: 14px;
+  background: var(--bg-main);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.badge-photo-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid var(--line);
+  background: var(--bg-sub);
+  position: relative;
+  overflow: hidden;
+  margin-top: 14px;
+}
+#avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* JS 检测成功后显示 */
+}
+/* 占位符：图片未找到时的优雅备用样式 */
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-mute);
+}
+.avatar-placeholder .ph-mark {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+.avatar-placeholder .ph-hint {
+  font-size: 9.5px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 14px;
+}
+/* 角落十字标记，模拟相纸/底片边角，呼应杂志摄影排版 */
+.badge-photo-frame::before, .badge-photo-frame::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  border: 1px solid var(--text-mute);
+  opacity: 0.5;
+}
+.badge-photo-frame::before { top: 7px; left: 7px; border-right: none; border-bottom: none; }
+.badge-photo-frame::after  { bottom: 7px; right: 7px; border-left: none; border-top: none; }
+
+/* 工牌底部信息条：姓名 + 职位，模拟真实工牌排版 */
+.badge-info {
+  text-align: center;
+  margin-top: 14px;
+}
+.badge-name {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+.badge-role {
+  font-size: 9.5px;
+  color: var(--text-mute);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+/* 工牌底部条状装饰线，模拟卡片磁条/二维码区域 */
+.badge-strip {
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--text-main) 0px, var(--text-main) 2px,
+    transparent 2px, transparent 4px
+  );
+  margin-top: 12px;
+  opacity: 0.35;
+}
+
+.avatar-caption {
+  font-size: 11px;
+  color: var(--text-mute);
+  text-align: center;
+  letter-spacing: 0.5px;
+  margin-top: 16px;
+}
+
+/* —— Home Page 行动按钮（Download Resume / Contact Me） —— */
+.home-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 28px 0 30px;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 13px 24px;
+  border: 1px solid var(--btn-color);
+  cursor: pointer;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.25s var(--ease);
+  text-transform: uppercase;
+}
+/* 主按钮：下载简历，实心深棕底 */
+.cta-btn.primary {
+  background: var(--btn-color);
+  color: var(--bg-main);
+}
+.cta-btn.primary:hover {
+  background: #3d3322;
+  transform: translateY(-2px);
+}
+/* 次按钮：联系我，描边款 */
+.cta-btn.secondary {
+  background: transparent;
+  color: var(--btn-color);
+}
+.cta-btn.secondary:hover {
+  background: var(--btn-color);
+  color: var(--bg-main);
+  transform: translateY(-2px);
+}
+.cta-btn svg { flex-shrink: 0; }
+
+@media (max-width: 700px) {
+  .home-cta-row { flex-direction: column; }
+  .cta-btn { justify-content: center; }
+}
+
+/* 首页数据统计：杂志式三栏，无卡片底色，仅靠分隔线 */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.stat-card {
+  padding: 0 24px;
+  border-right: 1px solid var(--line);
+}
+.stat-card:first-child { padding-left: 0; }
+.stat-card:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--btn-color);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-desc {
+  font-size: 12.5px;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+/* =========================================================
+   八、栏目标题 — 杂志页眉式
+========================================================= */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 44px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--text-main);
+}
+.sec-title-group .sec-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+}
+.sec-title {
+  font-family: var(--font-serif);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+.sec-folio {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--text-mute);
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   九、经历 EXPERIENCE — 杂志专题文章式排版
+========================================================= */
+.article-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 32px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+}
+.article-item:first-child { padding-top: 0; }
+.article-item:last-child { border-bottom: none; }
+
+.article-date {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--text-mute);
+  line-height: 1.6;
+  padding-top: 6px;
+}
+.article-date .yr { display: block; font-size: 22px; color: var(--btn-color); font-weight: 700; }
+
+.article-org {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+.article-role {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--btn-color);
+  margin-bottom: 18px;
+}
+
+.article-bullets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+.article-bullet {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-sub);
+  line-height: 1.75;
+}
+.article-bullet .mark {
+  font-family: var(--font-serif);
+  color: var(--btn-color);
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+/* 标签：低饱和，纯文字+边框，无填充色块 */
+.article-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.article-tag {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-sub);
+  border: 1px solid var(--line);
+  padding: 4px 12px;
+}
+
+/* =========================================================
+   十、教育 EDUCATION
+========================================================= */
+.edu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--line);
+}
+.edu-card {
+  padding: 36px;
+  position: relative;
+}
+.edu-card:first-child { border-right: 1px solid var(--line); }
+.edu-level {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+}
+.edu-degree {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.edu-school {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  margin-bottom: 28px;
+}
+.edu-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.edu-date { font-size: 12px; color: var(--text-mute); }
+.edu-gpa {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--btn-color);
+  line-height: 1;
+}
+.edu-gpa-label {
+  font-size: 9.5px;
+  color: var(--text-mute);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* =========================================================
+   十一、技能 SKILLS
+========================================================= */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.skill-group {
+  padding: 32px 36px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.skill-group-title {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-main);
+  margin-bottom: 22px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.skill-list { display: flex; flex-direction: column; gap: 16px; }
+.skill-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+.skill-name { font-size: 13.5px; font-weight: 500; color: var(--text-main); }
+.skill-level { font-size: 10.5px; color: var(--text-mute); letter-spacing: 0.5px; }
+.skill-bar-bg { height: 2px; background: var(--bg-sub); }
+.skill-bar-fill { height: 100%; background: var(--btn-color); transition: width 1s var(--ease); }
+
+.tools-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+.tool-tag {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-sub);
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0 4px 0;
+  margin-right: 4px;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.tool-tag:hover { color: var(--btn-color); border-color: var(--btn-color); }
+
+/* =========================================================
+   十二、荣誉/成就 ACHIEVEMENTS — 杂志画廊式，含图片+说明文字
+========================================================= */
+.achieve-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px 36px;
+}
+.achieve-card { display: flex; flex-direction: column; }
+
+/* 照片区域 —— 占位图清晰标注，便于用户替换 */
+.achieve-photo-frame {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.achieve-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* JS 检测到图片存在才显示 */
+}
+/* 占位符内容：清楚写明应替换的文件名 */
+.achieve-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-mute);
+  text-align: center;
+  padding: 0 16px;
+}
+.achieve-photo-placeholder .ph-icon {
+  font-size: 26px;
+  opacity: 0.6;
+}
+.achieve-photo-placeholder .ph-filename {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--btn-color);
+  letter-spacing: 0.5px;
+  background: var(--bg-main);
+  padding: 3px 10px;
+  border: 1px dashed var(--text-mute);
+}
+.achieve-photo-placeholder .ph-size {
+  font-size: 10px;
+  color: var(--text-mute);
+}
+/* 角标：图片编号，呼应杂志画廊排版 */
+.achieve-photo-frame .photo-no {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-mute);
+  background: rgba(243,239,228,0.85);
+  padding: 2px 8px;
+  z-index: 2;
+}
+
+.achieve-date {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+}
+.achieve-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+.achieve-sub {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--btn-color);
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.achieve-desc {
+  font-size: 13.5px;
+  color: var(--text-sub);
+  line-height: 1.75;
+  margin-bottom: 10px;
+}
+/* 照片配文 —— 用户可编辑的一小段文字，呈现为图说 caption 样式 */
+.achieve-caption {
+  font-size: 12px;
+  color: var(--text-mute);
+  font-style: italic;
+  line-height: 1.6;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+}
+
+/* =========================================================
+   十二点五、关于我 ABOUT ME — 深色基调的人物专访页
+   保持杂志排版骨架，但用深色块营造对比，呼应"专访页"的氛围
+========================================================= */
+
+/* 深色变量：仅在 About 页内局部使用，不影响全站 */
+.about-dark {
+  background: var(--text-main);     /* 用主文字色当作深色背景，形成强对比 */
+  color: var(--bg-main);
+  padding: 56px var(--gutter);
+  margin: 0 calc(-1 * var(--gutter)) 48px;  /* 撑满到页面边缘，制造"插页"感 */
+}
+@media (min-width: 901px) {
+  .about-dark { margin: 0 0 48px; padding: 64px 56px; }
+}
+
+.about-dark .issue-label { color: rgba(243,239,228,0.55); }
+.about-dark .issue-label::after { background: rgba(243,239,228,0.2); }
+
+.about-quote {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.5px;
+  max-width: 760px;
+  margin: 18px 0 0;
+}
+.about-quote .quote-mark {
+  font-size: 0.7em;
+  color: #C9A876; /* 暖金色引号，深色背景中的唯一点缀色 */
+  margin-right: 4px;
+}
+
+/* 性格关键词标签 —— 深色背景上的描边标签 */
+.trait-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 32px;
+}
+.trait-tag {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--bg-main);
+  border: 1px solid rgba(243,239,228,0.35);
+  padding: 7px 16px;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.trait-tag:hover {
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+/* 关于我 — 正文段落区（浅色区域，承接深色引言块） */
+.about-body {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+.about-body-index {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--text-mute);
+  padding-top: 4px;
+}
+.about-body p {
+  font-size: 14.5px;
+  color: var(--text-sub);
+  line-height: 1.9;
+  max-width: 640px;
+}
+.about-body p + p { margin-top: 16px; }
+
+/* 性格特质卡片 —— 三栏，深色编号 + 浅色说明，呼应整体杂志感但局部用深色强调数字 */
+.trait-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.trait-card {
+  padding: 28px 26px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.trait-num {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bg-main);
+  background: var(--text-main);  /* 深色编号方块，作为深浅对比的呼应元素 */
+  display: inline-block;
+  padding: 2px 10px;
+  margin-bottom: 14px;
+}
+.trait-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+.trait-desc {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .about-body { grid-template-columns: 1fr; }
+  .trait-grid { grid-template-columns: 1fr; }
+  .trait-card:nth-child(odd) { border-right: 1px solid var(--line); }
+}
+@media (max-width: 700px) {
+  .about-dark { padding: 40px 18px; margin: 0 -18px 36px; }
+}
+
+/* =========================================================
+   十二点六、Gallery 旅行画廊 — 拼贴/胶片风排版
+   每个地点一个 section，3 张照片错位叠放，模拟旅行剪贴本质感
+   照片底部标注经纬度（纬度 N/S），并带有深色"护照印章"式角标
+========================================================= */
+
+/* 整个 Gallery 页的深色引言区（与 About 呼应，制造统一的"深色插页"语言） */
+.gallery-intro {
+  background: var(--text-main);
+  color: var(--bg-main);
+  padding: 56px var(--gutter);
+  margin: 0 calc(-1 * var(--gutter)) 64px;
+}
+@media (min-width: 901px) {
+  .gallery-intro { margin: 0 0 64px; padding: 64px 56px; }
+}
+.gallery-intro .issue-label { color: rgba(243,239,228,0.55); }
+.gallery-intro .issue-label::after { background: rgba(243,239,228,0.2); }
+.gallery-intro-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 720px;
+  margin-top: 16px;
+}
+.gallery-intro-sub {
+  font-size: 14px;
+  color: rgba(243,239,228,0.7);
+  margin-top: 16px;
+  max-width: 540px;
+  line-height: 1.8;
+}
+
+/* 国家/地点分区标题 —— 大号衬线字 + 编号 + 坐标范围，杂志式章节开篇 */
+.location-section {
+  margin-bottom: 96px;
+}
+.location-section:last-child { margin-bottom: 40px; }
+
+.location-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin-bottom: 40px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.location-num {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bg-main);
+  background: var(--btn-color); /* 深棕底色编号块，护照章质感 */
+  padding: 4px 12px;
+  flex-shrink: 0;
+}
+.location-name {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+.location-coord {
+  font-size: 11.5px;
+  color: var(--text-mute);
+  letter-spacing: 1px;
+  margin-left: auto;
+  font-family: 'Courier New', monospace;
+}
+
+/* 拼贴照片容器 —— 三张照片错位叠放，模拟随手贴上的旅行快照 */
+.collage-wrap {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+  padding: 20px 10px 40px;
+}
+
+/* 每一张拼贴照片：随机角度旋转 + 不规则阴影，营造"剪贴本"随性感 */
+.collage-photo {
+  position: relative;
+  background: var(--surface);
+  padding: 14px 14px 40px;       /* 底部留白多，模拟拍立得相纸 */
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 24px rgba(26,25,30,0.18);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), z-index 0s;
+  cursor: default;
+}
+/* 三张照片分别给不同的倾斜角度和上下错位，制造"随手贴"的不规则感 */
+.collage-photo.tilt-a { transform: rotate(-3.5deg) translateY(10px); z-index: 1; }
+.collage-photo.tilt-b { transform: rotate(2deg) translateY(-12px); z-index: 2; }
+.collage-photo.tilt-c { transform: rotate(-1.5deg) translateY(6px); z-index: 1; }
+
+/* 鼠标悬停时回正、放大并提升层级，增加互动趣味性 */
+.collage-photo:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.04);
+  box-shadow: 0 18px 34px rgba(26,25,30,0.28);
+  z-index: 10;
+}
+
+.collage-photo-frame {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: var(--bg-sub);
+  overflow: hidden;
+  position: relative;
+}
+.collage-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* JS 探测成功后显示 */
+}
+/* 占位符：清楚标注应替换的文件名，避免布局塌陷 */
+.collage-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-mute);
+  text-align: center;
+  padding: 0 10px;
+}
+.collage-photo-placeholder .ph-icon { font-size: 22px; opacity: 0.55; }
+.collage-photo-placeholder .ph-filename {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--btn-color);
+  background: var(--bg-main);
+  padding: 2px 8px;
+  border: 1px dashed var(--text-mute);
+  word-break: break-all;
+}
+
+/* 拍立得底部留白处放经纬度文字标注（北纬/南纬 + 西经/东经） */
+.collage-caption {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  text-align: center;
+}
+.collage-caption .coord-text {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--btn-color);
+  letter-spacing: 0.5px;
+}
+.collage-caption .place-text {
+  font-size: 10px;
+  color: var(--text-mute);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* 角落小图钉装饰，强化"贴上去"的手作感 */
+.collage-photo::before {
+  content: '📌';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  font-size: 18px;
+  opacity: 0.85;
+  z-index: 3;
+}
+
+/* 移动端：拼贴改为纵向堆叠，仍保留轻微错位与图钉效果 */
+@media (max-width: 900px) {
+  .collage-wrap {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 16px 0 32px;
+  }
+  .collage-photo.tilt-a { transform: rotate(-2.5deg); }
+  .collage-photo.tilt-b { transform: rotate(2deg); }
+  .collage-photo.tilt-c { transform: rotate(-1.5deg); }
+  .collage-photo:hover { transform: rotate(0deg) scale(1.03); }
+  .location-coord { margin-left: 0; width: 100%; }
+}
+
+/* =========================================================
+   十三、页脚 FOOTER
+========================================================= */
+footer {
+  text-align: center;
+  padding: 36px 24px;
+  font-size: 11.5px;
+  color: var(--text-mute);
+  border-top: 1px solid var(--line);
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   十四、响应式布局 RESPONSIVE — 手机/平板适配
+========================================================= */
+@media (max-width: 900px) {
+  .page-wrap { grid-template-columns: 1fr; }
+  .side-rail { display: none; } /* 移动端隐藏装饰竖栏，节省空间 */
+  main { padding: 40px 20px 80px; }
+
+  .home-hero { grid-template-columns: 1fr; gap: 32px; }
+  .avatar-col { max-width: 240px; margin: 0 auto; order: -1; } /* 头像移到文字上方 */
+  .home-name { font-size: clamp(40px, 11vw, 56px); }
+
+  .article-item { grid-template-columns: 1fr; gap: 12px; }
+  .article-date { display: flex; align-items: baseline; gap: 8px; padding-top: 0; }
+  .article-date .yr { font-size: 16px; }
+
+  .edu-grid { grid-template-columns: 1fr; }
+  .edu-card:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+
+  .skills-grid { grid-template-columns: 1fr; }
+  .skill-group { border-right: none; }
+
+  .achieve-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 700px) {
+  nav { padding: 0 18px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-card { border-right: none; border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .stat-card:first-child { padding-top: 0; }
+  .stat-card:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .sec-title { font-size: 28px; }
+  .sec-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+@media (max-width: 420px) {
+  .home-bio::first-letter { font-size: 32px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================================
+     顶部导航 NAVIGATION
+====================================================== -->
+<nav>
+  <div class="nav-logo">TEOH ZI HENG<span class="logo-no">PERSONAL PORTFOLIO</span></div>
+
+  <!-- PC 端导航 -->
+  <ul class="nav-links" id="navLinks">
+    <li><button class="active" data-section="home" onclick="showSection('home', this)">Home</button></li>
+    <li><button data-section="about" onclick="showSection('about', this)">About Me</button></li>
+    <li><button data-section="experience" onclick="showSection('experience', this)">Experience</button></li>
+    <li><button data-section="education" onclick="showSection('education', this)">Education</button></li>
+    <li><button data-section="skills" onclick="showSection('skills', this)">Skills</button></li>
+    <li><button data-section="achievements" onclick="showSection('achievements', this)">Achievements</button></li>
+    <li><button data-section="gallery" onclick="showSection('gallery', this)">Gallery</button></li>
+  </ul>
+
+  <!-- 移动端汉堡按钮 -->
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- 移动端下拉菜单 -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="active" onclick="showSection('home', this); closeMobileMenu()">Home</button>
+  <button onclick="showSection('about', this); closeMobileMenu()">About Me</button>
+  <button onclick="showSection('experience', this); closeMobileMenu()">Experience</button>
+  <button onclick="showSection('education', this); closeMobileMenu()">Education</button>
+  <button onclick="showSection('skills', this); closeMobileMenu()">Skills</button>
+  <button onclick="showSection('achievements', this); closeMobileMenu()">Achievements</button>
+  <button onclick="showSection('gallery', this); closeMobileMenu()">Gallery</button>
+</div>
+
+<!-- ======================================================
+     页面整体容器（含左侧装饰竖栏 + 主内容）
+====================================================== -->
+<div class="page-wrap">
+
+  <!-- 左侧竖排装饰栏，仅 PC 端显示，呼应杂志页边刊号 -->
+  <div class="side-rail">
+    <span class="side-rail-text">PORTFOLIO — 2025 EDITION</span>
+  </div>
+
+  <main>
+
+    <!-- ============ 首页 HOME ============ -->
+    <section class="section active" id="home">
+
+      <p class="issue-label reveal">ISSUE NO.01 — INTRODUCTION</p>
+
+      <div class="home-hero">
+        <!-- 左：文字区块 -->
+        <div>
+          <h1 class="home-name reveal reveal-delay-1">Teoh<br><em>Zi Heng</em></h1>
+          <p class="home-role reveal reveal-delay-2">Aspiring Data Analyst &amp; Business Intelligence Specialist</p>
+          <p class="home-bio reveal reveal-delay-2">
+            Fresh graduate in Business Information Systems (Data Analytics) with hands-on experience
+            delivering automation and analytics solutions in a corporate environment. Passionate about
+            transforming raw data into actionable business value through Python, Power BI, and Tableau.
+          </p>
+
+          <!-- 联系方式：加上 id="contact" 作为 Contact Me 按钮的滚动锚点 -->
+          <div class="contact-list reveal reveal-delay-3" id="contact">
+            <a class="contact-row" href="tel:+60194079661">
+              <span class="label">Phone</span> +60 19-407 9661
+            </a>
+            <a class="contact-row" href="mailto:teohziheng2002@gmail.com">
+              <span class="label">Email</span> teohziheng2002@gmail.com
+            </a>
+            <a class="contact-row" href="https://www.linkedin.com/in/zihengteoh" target="_blank" rel="noopener">
+              <span class="label">LinkedIn</span> linkedin.com/in/zihengteoh
+            </a>
+          </div>
+
+          <!-- 行动按钮：Download Resume（直接下载本地 resume.pdf） / Contact Me（滚动到上方联系方式区） -->
+          <div class="home-cta-row reveal reveal-delay-3">
+            <!-- download 属性会让浏览器直接下载文件而非跳转打开；resume.pdf 需与本 HTML 文件放在同一目录 -->
+            <a class="cta-btn primary" href="resume.pdf" download="Teoh_Zi_Heng_Resume.pdf">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Resume
+            </a>
+            <button class="cta-btn secondary" onclick="scrollToContact()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Contact Me
+            </button>
+          </div>
+
+          <!-- 语言 -->
+          <div class="lang-row reveal reveal-delay-4">
+            <span class="lang-item">English</span>
+            <span class="lang-item">Malay</span>
+            <span class="lang-item">Mandarin</span>
+            <span class="lang-item">Cantonese</span>
+          </div>
+        </div>
+
+        <!-- 右：头像区块 —— 工牌挂绳 LANYARD BADGE -->
+        <div class="avatar-col reveal reveal-delay-2">
+          <div class="lanyard-unit">
+            <!-- 挂绳带 -->
+            <div class="lanyard-strap"></div>
+            <!-- 金属扣环 -->
+            <div class="lanyard-clip"></div>
+            <!-- 工牌卡片 -->
+            <div class="badge-card">
+              <div class="badge-photo-frame">
+                <!-- JS 会按优先级依次尝试 avatar.png → avatar.jpg → avatar.jpeg -->
+                <img id="avatar-img" alt="Teoh Zi Heng" />
+                <!-- 占位符：清晰标注替换方式 -->
+                <div class="avatar-placeholder" id="avatar-placeholder">
+                  <span class="ph-mark">TZH</span>
+                  <span class="ph-hint">【占位头像】<br>请将照片命名为<br>avatar.png / .jpg / .jpeg<br>放入本文件同一目录</span>
+                </div>
+              </div>
+              <div class="badge-info">
+                <div class="badge-name">TEOH ZI HENG</div>
+                <div class="badge-role">Data Analyst</div>
+              </div>
+              <div class="badge-strip"></div>
+            </div>
+          </div>
+          <p class="avatar-caption">FIG. 01 — STAFF PASS</p>
+        </div>
+      </div>
+
+      <!-- 数据统计 -->
+      <div class="stats-row reveal">
+        <div class="stat-card">
+          <div class="stat-num">15+</div>
+          <div class="stat-desc">Automation initiatives delivered at AstraZeneca</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">40+</div>
+          <div class="stat-desc">Analytics &amp; automation projects consulted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3.45</div>
+          <div class="stat-desc">CGPA — Bachelor of Information Systems</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 关于我 ABOUT ME ============ -->
+    <section class="section" id="about">
+
+      <!-- 深色引言插页：营造"专访页"氛围，可在此处替换为你自己的座右铭/口头禅 -->
+      <div class="about-dark reveal">
+        <p class="issue-label">ISSUE NO.1.5 — ABOUT ME</p>
+        <p class="about-quote">
+          <span class="quote-mark">“</span>I believe the best insights come from staying curious,
+          asking one more question, and turning data into stories people actually act on.
+        </p>
+        <!-- 性格关键词标签：可自由增删替换 -->
+        <div class="trait-row">
+          <span class="trait-tag">Curious by nature</span>
+          <span class="trait-tag">Detail-oriented</span>
+          <span class="trait-tag">Calm under pressure</span>
+          <span class="trait-tag">Team player</span>
+          <span class="trait-tag">Always learning</span>
+        </div>
+      </div>
+
+      <!-- 正文段落：可在此处替换为你自己的性格描述文字 -->
+      <div class="about-body reveal">
+        <span class="about-body-index">01 /</span>
+        <div>
+          <p>
+            I'm someone who finds genuine satisfaction in untangling messy data and turning it into
+            something people can actually use — whether that's a dashboard, an automation script, or
+            a five-minute story for a stakeholder who just wants the bottom line.
+          </p>
+          <p>
+            Outside of spreadsheets and code, I'd describe myself as easygoing but persistent — I don't
+            mind sitting with a hard problem for a while, but I also know when to step back, ask for
+            input, and adjust. I enjoy working in teams where people are upfront with each other, and
+            I try to bring that same directness paired with patience to how I communicate.
+          </p>
+          <p>
+            I'm also a fairly restless traveller — give me a free weekend and I'll probably be looking
+            at flights. That curiosity about new places mirrors how I approach data: I like exploring
+            first, asking questions later, and only then deciding what the story actually is.
+          </p>
+        </div>
+      </div>
+
+      <!-- 性格特质卡片：三栏式，便于扩展或替换文字 -->
+      <div class="trait-grid reveal">
+        <div class="trait-card">
+          <span class="trait-num">01</span>
+          <h3 class="trait-title">Analytical Mindset</h3>
+          <p class="trait-desc">I naturally break problems down into smaller pieces and look for the pattern before jumping to conclusions.</p>
+        </div>
+        <div class="trait-card">
+          <span class="trait-num">02</span>
+          <h3 class="trait-title">Collaborative</h3>
+          <p class="trait-desc">I work best when ideas are shared openly — I'd rather ask a "silly" question early than guess and get it wrong.</p>
+        </div>
+        <div class="trait-card">
+          <span class="trait-num">03</span>
+          <h3 class="trait-title">Quietly Adventurous</h3>
+          <p class="trait-desc">Whether it's a new dataset or a new country, I'm drawn to the unfamiliar and enjoy figuring things out as I go.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 经历 EXPERIENCE ============ -->
+    <section class="section" id="experience">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Career &amp; Projects</p>
+          <h2 class="sec-title">Experience</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.02</span>
+      </div>
+
+      <!-- AstraZeneca -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2025</span>Jan – May</div>
+        <div>
+          <h3 class="article-org">AstraZeneca</h3>
+          <p class="article-role">Innovation &amp; Strategy Intern</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Partnered with trainers and internal stakeholders to support digital upskilling programs
+              for 100+ participants, enabling adoption of self-service reporting and automation tools,
+              resulting in improved workflow efficiency and a stronger data-driven decision-making culture.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Consulted on and supported over 40 automation and data analytics projects within the
+              finance function in Kuala Lumpur, enabling smoother financial reporting and providing
+              stakeholders with a more comprehensive view of financial processes.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Developed and implemented automation solutions across multiple departments, saving an
+              estimated 10–200 working hours annually per project.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Delivered over 15 automation initiatives, including SAP Data Extraction, BSR Automation,
+              OCR Systems, Automated Inquiry Resolution Platform, and Leaver Tracker, collectively
+              enhancing process efficiency and reducing manual workload.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">10–200 hrs saved / project</span>
+            <span class="article-tag">40+ projects</span>
+            <span class="article-tag">Python</span>
+            <span class="article-tag">Power BI</span>
+            <span class="article-tag">SAP</span>
+            <span class="article-tag">OCR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Year Project -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2024</span>July</div>
+        <div>
+          <h3 class="article-org">Final Year Project</h3>
+          <p class="article-role">Social Media Sentiment Analysis — Taylor Swift's Eras Tour (Singapore)</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Conducted a large-scale sentiment analysis on social media data to evaluate public
+              reactions toward the concert announcement in Singapore.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Delivered an analytical report on audience emotions and engagement trends, identifying key
+              behavioral patterns and engagement preferences from the data.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Communicated sentiment trends through data visualization and storytelling to help
+              audiences understand the overall public impact and reaction.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Utilized R Studio for text mining and sentiment classification, and Tableau for data
+              visualization and insight presentation.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">R Studio</span>
+            <span class="article-tag">Tableau</span>
+            <span class="article-tag">Text Mining</span>
+            <span class="article-tag">NLP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Spark -->
+      <div class="article-item reveal">
+        <div class="article-date"><span class="yr">2024</span>May</div>
+        <div>
+          <h3 class="article-org">Data Spark Competition</h3>
+          <p class="article-role">Competitor — Top 6 Finalist</p>
+          <div class="article-bullets">
+            <div class="article-bullet"><span class="mark">—</span>
+              Achieved Top 6 in the competition by analyzing global QS university datasets to identify
+              trends in international student distribution, research output, and institutional
+              performance.
+            </div>
+            <div class="article-bullet"><span class="mark">—</span>
+              Collaborated in a team to deliver data-driven insights and present findings on stage to
+              judges and participants, demonstrating strong analytical and presentation skills.
+            </div>
+          </div>
+          <div class="article-tags">
+            <span class="article-tag">Top 6 Finalist</span>
+            <span class="article-tag">Data Analysis</span>
+            <span class="article-tag">Presentation</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 教育 EDUCATION ============ -->
+    <section class="section" id="education">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Academic Background</p>
+          <h2 class="sec-title">Education</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.03</span>
+      </div>
+
+      <div class="edu-grid reveal">
+
+        <!-- Swinburne -->
+        <div class="edu-card">
+          <p class="edu-level">Bachelor's Degree</p>
+          <h3 class="edu-degree">Bachelor of Information System<br>Major in Data Analytics</h3>
+          <p class="edu-school">Swinburne University of Technology</p>
+          <div class="edu-meta-row">
+            <span class="edu-date">Aug 2022 – 2025</span>
+            <div>
+              <div class="edu-gpa">3.45</div>
+              <div class="edu-gpa-label">CGPA</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UTAR -->
+        <div class="edu-card">
+          <p class="edu-level">Foundation</p>
+          <h3 class="edu-degree">Foundation in Arts</h3>
+          <p class="edu-school">Universiti Tunku Abdul Rahman (UTAR)</p>
+          <div class="edu-meta-row">
+            <span class="edu-date">Mar 2020 – Mar 2021</span>
+            <div>
+              <div class="edu-gpa">3.50</div>
+              <div class="edu-gpa-label">CGPA</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 技能 SKILLS ============ -->
+    <section class="section" id="skills">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Competencies</p>
+          <h2 class="sec-title">Skills &amp; Tools</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.04</span>
+      </div>
+
+      <div class="skills-grid reveal">
+
+        <!-- 编程与数据 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Programming &amp; Data</p>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Python (Pandas, OpenPyXL, Selenium, Pytesseract)</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">SQL</span>
+                <span class="skill-level">Proficient</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:78%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">R Studio</span>
+                <span class="skill-level">Proficient</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:70%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BI 与可视化 -->
+        <div class="skill-group">
+          <p class="skill-group-title">BI &amp; Visualisation</p>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Power BI</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:82%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Tableau</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-row">
+                <span class="skill-name">Microsoft Excel</span>
+                <span class="skill-level">Advanced</span>
+              </div>
+              <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 工具与平台 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Tools &amp; Platforms</p>
+          <div class="tools-cloud">
+            <span class="tool-tag">Power Apps</span>
+            <span class="tool-tag">Front End Web Dev</span>
+            <span class="tool-tag">SAP Data Extraction</span>
+            <span class="tool-tag">OCR Systems</span>
+            <span class="tool-tag">BSR Automation</span>
+          </div>
+        </div>
+
+        <!-- 软技能 -->
+        <div class="skill-group">
+          <p class="skill-group-title">Professional Skills</p>
+          <div class="tools-cloud">
+            <span class="tool-tag">Data Storytelling</span>
+            <span class="tool-tag">Stakeholder Comms</span>
+            <span class="tool-tag">Problem Solving</span>
+            <span class="tool-tag">Project Consulting</span>
+            <span class="tool-tag">Process Automation</span>
+            <span class="tool-tag">Digital Upskilling</span>
+            <span class="tool-tag">Team Collaboration</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 荣誉/成就 ACHIEVEMENTS ============ -->
+    <section class="section" id="achievements">
+
+      <div class="sec-header reveal">
+        <div class="sec-title-group">
+          <p class="sec-eyebrow">Recognition &amp; Highlights</p>
+          <h2 class="sec-title">Achievements</h2>
+        </div>
+        <span class="sec-folio">ISSUE NO.05</span>
+      </div>
+
+      <div class="achieve-grid">
+
+        <!-- 卡片 1：Data Spark Competition -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-1">
+            <span class="photo-no">01</span>
+            <!-- JS 会依次尝试 achievement-1.png / .jpg / .jpeg -->
+            <img alt="Data Spark Competition photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-1.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">MAY 2024</div>
+          <div class="achieve-title">Data Spark Competition</div>
+          <div class="achieve-sub">Top 6 Finalist</div>
+          <p class="achieve-desc">
+            Achieved Top 6 among competing teams by analyzing global QS university datasets to uncover
+            trends in international student distribution, research output, and institutional performance.
+          </p>
+          <!-- 照片配文：可在此处直接编辑替换为自己的说明文字 -->
+          <p class="achieve-caption">On stage presenting our team's findings to the judging panel.</p>
+        </div>
+
+        <!-- 卡片 2：AstraZeneca Automation -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-2">
+            <span class="photo-no">02</span>
+            <img alt="AstraZeneca automation initiatives photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-2.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">JAN – MAY 2025</div>
+          <div class="achieve-title">15+ Automation Initiatives at AstraZeneca</div>
+          <div class="achieve-sub">10–200 hrs saved / project</div>
+          <p class="achieve-desc">
+            Delivered over 15 automation solutions including SAP Data Extraction, BSR Automation, OCR
+            Systems, Automated Inquiry Resolution Platform, and Leaver Tracker.
+          </p>
+          <p class="achieve-caption">A snapshot from the digital upskilling workshop in Kuala Lumpur.</p>
+        </div>
+
+        <!-- 卡片 3：Final Year Project -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-3">
+            <span class="photo-no">03</span>
+            <img alt="Final Year Project photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-3.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">JULY 2024</div>
+          <div class="achieve-title">Final Year Project — Sentiment Analysis</div>
+          <div class="achieve-sub">Large-scale Social Media Study</div>
+          <p class="achieve-desc">
+            Conducted a large-scale sentiment analysis on social media reactions to Taylor Swift's Eras
+            Tour announcement in Singapore, delivering an analytical report on public emotions and trends.
+          </p>
+          <p class="achieve-caption">Presenting the sentiment analysis dashboard built in Tableau.</p>
+        </div>
+
+        <!-- 卡片 4：Swinburne Graduation -->
+        <div class="achieve-card reveal">
+          <div class="achieve-photo-frame" data-photo-base="achievement-4">
+            <span class="photo-no">04</span>
+            <img alt="Swinburne University graduation photo" />
+            <div class="achieve-photo-placeholder">
+              <span class="ph-icon">🖼</span>
+              <span class="ph-filename">achievement-4.png / .jpg / .jpeg</span>
+              <span class="ph-size">建议比例 4:3，放入本文件同一目录</span>
+            </div>
+          </div>
+          <div class="achieve-date">AUG 2022 – 2025</div>
+          <div class="achieve-title">Bachelor's Degree — CGPA 3.45</div>
+          <div class="achieve-sub">Swinburne University</div>
+          <p class="achieve-desc">
+            Completed a Bachelor of Information System majoring in Data Analytics at Swinburne University
+            of Technology, achieving a strong CGPA of 3.45.
+          </p>
+          <p class="achieve-caption">Outside the Swinburne campus on graduation day.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 旅行画廊 GALLERY ============ -->
+    <section class="section" id="gallery">
+
+      <!-- 深色引言插页：呼应 About Me 的深色插页风格 -->
+      <div class="gallery-intro reveal">
+        <p class="issue-label">ISSUE NO.06 — TRAVEL JOURNAL</p>
+        <h2 class="gallery-intro-title">Places I've Been</h2>
+        <p class="gallery-intro-sub">
+          A scrapbook of cities and landscapes that left a mark — pinned, tilted, and slightly out of
+          order, just like how I remember them.
+        </p>
+      </div>
+
+      <!-- 01 —— Montana, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">01</span>
+          <h3 class="location-name">Montana, USA</h3>
+          <span class="location-coord">46.8797° N / 110.3626° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="montana-1">
+            <img alt="Montana, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">montana-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">46.8797° N, 110.3626° W</div>
+            <div class="place-text">MONTANA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="montana-2">
+            <img alt="Montana, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">montana-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">46.8797° N, 110.3626° W</div>
+            <div class="place-text">MONTANA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="montana-3">
+            <img alt="Montana, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">montana-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">46.8797° N, 110.3626° W</div>
+            <div class="place-text">MONTANA, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 02 —— Alaska, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">02</span>
+          <h3 class="location-name">Alaska, USA</h3>
+          <span class="location-coord">64.2008° N / 149.4937° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="alaska-1">
+            <img alt="Alaska, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">alaska-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">64.2008° N, 149.4937° W</div>
+            <div class="place-text">ALASKA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="alaska-2">
+            <img alt="Alaska, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">alaska-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">64.2008° N, 149.4937° W</div>
+            <div class="place-text">ALASKA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="alaska-3">
+            <img alt="Alaska, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">alaska-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">64.2008° N, 149.4937° W</div>
+            <div class="place-text">ALASKA, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 03 —— Los Angeles, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">03</span>
+          <h3 class="location-name">Los Angeles, USA</h3>
+          <span class="location-coord">34.0522° N / 118.2437° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="los-angeles-1">
+            <img alt="Los Angeles, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">los-angeles-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0522° N, 118.2437° W</div>
+            <div class="place-text">LOS ANGELES, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="los-angeles-2">
+            <img alt="Los Angeles, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">los-angeles-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0522° N, 118.2437° W</div>
+            <div class="place-text">LOS ANGELES, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="los-angeles-3">
+            <img alt="Los Angeles, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">los-angeles-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0522° N, 118.2437° W</div>
+            <div class="place-text">LOS ANGELES, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 04 —— San Francisco, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">04</span>
+          <h3 class="location-name">San Francisco, USA</h3>
+          <span class="location-coord">37.7749° N / 122.4194° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="san-francisco-1">
+            <img alt="San Francisco, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">san-francisco-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.7749° N, 122.4194° W</div>
+            <div class="place-text">SAN FRANCISCO, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="san-francisco-2">
+            <img alt="San Francisco, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">san-francisco-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.7749° N, 122.4194° W</div>
+            <div class="place-text">SAN FRANCISCO, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="san-francisco-3">
+            <img alt="San Francisco, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">san-francisco-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.7749° N, 122.4194° W</div>
+            <div class="place-text">SAN FRANCISCO, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 05 —— Las Vegas, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">05</span>
+          <h3 class="location-name">Las Vegas, USA</h3>
+          <span class="location-coord">36.1699° N / 115.1398° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="las-vegas-1">
+            <img alt="Las Vegas, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">las-vegas-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">36.1699° N, 115.1398° W</div>
+            <div class="place-text">LAS VEGAS, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="las-vegas-2">
+            <img alt="Las Vegas, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">las-vegas-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">36.1699° N, 115.1398° W</div>
+            <div class="place-text">LAS VEGAS, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="las-vegas-3">
+            <img alt="Las Vegas, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">las-vegas-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">36.1699° N, 115.1398° W</div>
+            <div class="place-text">LAS VEGAS, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 06 —— Arizona, USA -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">06</span>
+          <h3 class="location-name">Arizona, USA</h3>
+          <span class="location-coord">34.0489° N / 111.0937° W</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="arizona-1">
+            <img alt="Arizona, USA photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">arizona-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0489° N, 111.0937° W</div>
+            <div class="place-text">ARIZONA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="arizona-2">
+            <img alt="Arizona, USA photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">arizona-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0489° N, 111.0937° W</div>
+            <div class="place-text">ARIZONA, USA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="arizona-3">
+            <img alt="Arizona, USA photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">arizona-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">34.0489° N, 111.0937° W</div>
+            <div class="place-text">ARIZONA, USA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 07 —— Seoul, South Korea -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">07</span>
+          <h3 class="location-name">Seoul, South Korea</h3>
+          <span class="location-coord">37.5665° N / 126.9780° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="seoul-1">
+            <img alt="Seoul, South Korea photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">seoul-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.5665° N, 126.9780° E</div>
+            <div class="place-text">SEOUL, SOUTH KOREA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="seoul-2">
+            <img alt="Seoul, South Korea photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">seoul-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.5665° N, 126.9780° E</div>
+            <div class="place-text">SEOUL, SOUTH KOREA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="seoul-3">
+            <img alt="Seoul, South Korea photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">seoul-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">37.5665° N, 126.9780° E</div>
+            <div class="place-text">SEOUL, SOUTH KOREA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 08 —— Hong Kong -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">08</span>
+          <h3 class="location-name">Hong Kong</h3>
+          <span class="location-coord">22.3193° N / 114.1694° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="hong-kong-1">
+            <img alt="Hong Kong photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">hong-kong-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.3193° N, 114.1694° E</div>
+            <div class="place-text">HONG KONG</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="hong-kong-2">
+            <img alt="Hong Kong photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">hong-kong-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.3193° N, 114.1694° E</div>
+            <div class="place-text">HONG KONG</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="hong-kong-3">
+            <img alt="Hong Kong photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">hong-kong-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.3193° N, 114.1694° E</div>
+            <div class="place-text">HONG KONG</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 09 —— Shenzhen, China -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">09</span>
+          <h3 class="location-name">Shenzhen, China</h3>
+          <span class="location-coord">22.5431° N / 114.0579° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="shenzhen-1">
+            <img alt="Shenzhen, China photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">shenzhen-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.5431° N, 114.0579° E</div>
+            <div class="place-text">SHENZHEN, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="shenzhen-2">
+            <img alt="Shenzhen, China photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">shenzhen-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.5431° N, 114.0579° E</div>
+            <div class="place-text">SHENZHEN, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="shenzhen-3">
+            <img alt="Shenzhen, China photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">shenzhen-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">22.5431° N, 114.0579° E</div>
+            <div class="place-text">SHENZHEN, CHINA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 10 —— Guangdong, China -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">10</span>
+          <h3 class="location-name">Guangdong, China</h3>
+          <span class="location-coord">23.1291° N / 113.2644° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="guangdong-1">
+            <img alt="Guangdong, China photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">guangdong-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">23.1291° N, 113.2644° E</div>
+            <div class="place-text">GUANGDONG, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="guangdong-2">
+            <img alt="Guangdong, China photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">guangdong-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">23.1291° N, 113.2644° E</div>
+            <div class="place-text">GUANGDONG, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="guangdong-3">
+            <img alt="Guangdong, China photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">guangdong-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">23.1291° N, 113.2644° E</div>
+            <div class="place-text">GUANGDONG, CHINA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 11 —— Chengdu, China -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">11</span>
+          <h3 class="location-name">Chengdu, China</h3>
+          <span class="location-coord">30.5728° N / 104.0668° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="chengdu-1">
+            <img alt="Chengdu, China photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">chengdu-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">30.5728° N, 104.0668° E</div>
+            <div class="place-text">CHENGDU, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="chengdu-2">
+            <img alt="Chengdu, China photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">chengdu-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">30.5728° N, 104.0668° E</div>
+            <div class="place-text">CHENGDU, CHINA</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="chengdu-3">
+            <img alt="Chengdu, China photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">chengdu-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">30.5728° N, 104.0668° E</div>
+            <div class="place-text">CHENGDU, CHINA</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 12 —— Tokyo, Japan -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">12</span>
+          <h3 class="location-name">Tokyo, Japan</h3>
+          <span class="location-coord">35.6762° N / 139.6503° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="tokyo-1">
+            <img alt="Tokyo, Japan photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">tokyo-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">35.6762° N, 139.6503° E</div>
+            <div class="place-text">TOKYO, JAPAN</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="tokyo-2">
+            <img alt="Tokyo, Japan photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">tokyo-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">35.6762° N, 139.6503° E</div>
+            <div class="place-text">TOKYO, JAPAN</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="tokyo-3">
+            <img alt="Tokyo, Japan photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">tokyo-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">35.6762° N, 139.6503° E</div>
+            <div class="place-text">TOKYO, JAPAN</div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- 13 —— Vietnam -->
+      <div class="location-section reveal">
+        <div class="location-header">
+          <span class="location-num">13</span>
+          <h3 class="location-name">Vietnam</h3>
+          <span class="location-coord">14.0583° N / 108.2772° E</span>
+        </div>
+        <div class="collage-wrap">
+        <div class="collage-photo tilt-a">
+          <div class="collage-photo-frame" data-photo-base="vietnam-1">
+            <img alt="Vietnam photo 1" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">vietnam-1.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">14.0583° N, 108.2772° E</div>
+            <div class="place-text">VIETNAM</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-b">
+          <div class="collage-photo-frame" data-photo-base="vietnam-2">
+            <img alt="Vietnam photo 2" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">vietnam-2.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">14.0583° N, 108.2772° E</div>
+            <div class="place-text">VIETNAM</div>
+          </div>
+        </div>
+        <div class="collage-photo tilt-c">
+          <div class="collage-photo-frame" data-photo-base="vietnam-3">
+            <img alt="Vietnam photo 3" />
+            <div class="collage-photo-placeholder">
+              <span class="ph-icon">📷</span>
+              <span class="ph-filename">vietnam-3.png / .jpg / .jpeg</span>
+            </div>
+          </div>
+          <div class="collage-caption">
+            <div class="coord-text">14.0583° N, 108.2772° E</div>
+            <div class="place-text">VIETNAM</div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 页脚 -->
+<footer>
+  <p>© 2025 Teoh Zi Heng · Built with HTML, CSS &amp; JavaScript</p>
+</footer>
+
+<!-- ======================================================
+     JAVASCRIPT 脚本区
+====================================================== -->
+<script>
+/* -------------------------------------------------------
+   一、栏目切换逻辑
+   点击导航按钮时，显示对应 section，隐藏其余所有 section
+   同时同步 PC 端与移动端两套菜单的高亮状态
+------------------------------------------------------- */
+function showSection(id, clickedBtn) {
+  // 隐藏所有内容区块
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  // 显示目标区块
+  document.getElementById(id).classList.add('active');
+
+  // 清除所有导航按钮的 active 状态
+  document.querySelectorAll('#navLinks button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#mobileMenu button').forEach(b => b.classList.remove('active'));
+
+  // 给 PC 端对应按钮加上 active
+  document.querySelectorAll('#navLinks button').forEach(b => {
+    if (b.getAttribute('data-section') === id) b.classList.add('active');
+  });
+  // 给移动端对应按钮加上 active（通过 onclick 字符串匹配 section id）
+  document.querySelectorAll('#mobileMenu button').forEach(b => {
+    if (b.getAttribute('onclick')?.includes(`'${id}'`)) b.classList.add('active');
+  });
+
+  // 切换栏目后，重新触发一次滚动检测，确保新区块内的 reveal 元素能正确显示
+  setTimeout(revealCheck, 50);
+  // 回到页面顶部，避免切换栏目后停留在上一页面的滚动位置
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* -------------------------------------------------------
+   一点五、Contact Me 按钮 — 平滑滚动到联系方式区块
+   联系方式区块本身就在 Home 页内（id="contact"），
+   因此先确保当前显示的是 Home 栏目，再执行滚动
+------------------------------------------------------- */
+function scrollToContact() {
+  // 若当前不在 Home 栏目，先切换回 Home（联系方式只存在于 Home 页内）
+  const homeSection = document.getElementById('home');
+  if (!homeSection.classList.contains('active')) {
+    showSection('home', document.querySelector('#navLinks button[data-section="home"]'));
+  }
+  // 延迟一帧再滚动，确保栏目切换后元素已经可见、位置计算正确
+  requestAnimationFrame(() => {
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
+/* -------------------------------------------------------
+   二、移动端菜单开关
+------------------------------------------------------- */
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+// 点击菜单外部区域时自动收起移动端菜单
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const ham  = document.getElementById('hamburger');
+  if (menu.classList.contains('open') && !menu.contains(e.target) && !ham.contains(e.target)) {
+    closeMobileMenu();
+  }
+});
+
+/* -------------------------------------------------------
+   三、头像图片「优先级探测」函数
+   依次尝试 avatar.png → avatar.jpg → avatar.jpeg
+   只要任意一种格式加载成功，立即显示该图片并隐藏占位符
+   若全部失败，则保留占位符（不会导致布局塌陷）
+------------------------------------------------------- */
+(function detectAvatar() {
+  const formats = ['avatar.png', 'avatar.jpg', 'avatar.jpeg'];
+  const img = document.getElementById('avatar-img');
+  const placeholder = document.getElementById('avatar-placeholder');
+  let tried = 0;
+
+  function tryNext() {
+    if (tried >= formats.length) return; // 全部尝试失败，保留占位符
+    img.onload = function() {
+      placeholder.style.display = 'none';
+      img.style.display = 'block';
+    };
+    img.onerror = function() {
+      tried++;
+      tryNext();
+    };
+    img.src = formats[tried++];
+  }
+  tryNext();
+})();
+
+/* -------------------------------------------------------
+   四、成就照片「优先级探测」函数（可复用同一套逻辑）
+   每个 .achieve-photo-frame 都带有 data-photo-base 属性
+   例如 data-photo-base="achievement-1" 会依次尝试：
+   achievement-1.png → achievement-1.jpg → achievement-1.jpeg
+------------------------------------------------------- */
+(function detectAchievementPhotos() {
+  document.querySelectorAll('.achieve-photo-frame').forEach(frame => {
+    const base = frame.getAttribute('data-photo-base');
+    if (!base) return;
+    const formats = [`${base}.png`, `${base}.jpg`, `${base}.jpeg`];
+    const img = frame.querySelector('img');
+    const placeholder = frame.querySelector('.achieve-photo-placeholder');
+    let tried = 0;
+
+    function tryNext() {
+      if (tried >= formats.length) return;
+      img.onload = function() {
+        placeholder.style.display = 'none';
+        img.style.display = 'block';
+      };
+      img.onerror = function() {
+        tried++;
+        tryNext();
+      };
+      img.src = formats[tried++];
+    }
+    tryNext();
+  });
+})();
+
+/* -------------------------------------------------------
+   四点五、Gallery 拼贴照片「优先级探测」函数
+   每个 .collage-photo-frame 都带有 data-photo-base 属性
+   例如 data-photo-base="montana-1" 会依次尝试：
+   montana-1.png → montana-1.jpg → montana-1.jpeg
+   命名规则：{地点slug}-{1/2/3}.png/.jpg/.jpeg
+   （地点 slug 对照表：montana / alaska / los-angeles / san-francisco /
+     las-vegas / arizona / seoul / hong-kong / shenzhen / guangdong /
+     chengdu / tokyo / vietnam）
+------------------------------------------------------- */
+(function detectGalleryPhotos() {
+  document.querySelectorAll('.collage-photo-frame').forEach(frame => {
+    const base = frame.getAttribute('data-photo-base');
+    if (!base) return;
+    const formats = [`${base}.png`, `${base}.jpg`, `${base}.jpeg`];
+    const img = frame.querySelector('img');
+    const placeholder = frame.querySelector('.collage-photo-placeholder');
+    let tried = 0;
+
+    function tryNext() {
+      if (tried >= formats.length) return;
+      img.onload = function() {
+        placeholder.style.display = 'none';
+        img.style.display = 'block';
+      };
+      img.onerror = function() {
+        tried++;
+        tryNext();
+      };
+      img.src = formats[tried++];
+    }
+    tryNext();
+  });
+})();
+
+/* -------------------------------------------------------
+   五、滚动渐入动效（Scroll Reveal）
+   使用 IntersectionObserver 监听所有 .reveal 元素
+   元素进入视口时添加 .is-visible 类，触发 CSS 渐入动画
+------------------------------------------------------- */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target); // 触发一次后不再监听，提升性能
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+function revealCheck() {
+  document.querySelectorAll('.reveal').forEach(el => {
+    if (!el.classList.contains('is-visible')) revealObserver.observe(el);
+  });
+}
+revealCheck(); // 页面加载时先执行一次
+
+/* -------------------------------------------------------
+   六、技能条动画
+   利用 IntersectionObserver，当技能区块进入视口时，
+   将技能条从 0 宽度过渡到实际百分比宽度
+------------------------------------------------------- */
+(function animateBars() {
+  document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+    bar._targetWidth = bar.style.width;
+    bar.style.width = '0%';
+  });
+
+  const barObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+          setTimeout(() => { bar.style.width = bar._targetWidth; }, 100);
+        });
+        barObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.skill-group').forEach(g => barObs.observe(g));
+})();
+</script>
+
+</body>
+</html>
